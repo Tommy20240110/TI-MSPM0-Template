@@ -1,0 +1,24 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "cwd": "${workspaceRoot}",
+            "executable": "${workspaceFolder}/build/outputs/${fileWorkspaceFolderBasename}.elf",
+            "name": "Debug with OpenOCD",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "configFiles": [
+                "interface/xds110.cfg",
+                "target/ti_mspm0.cfg"
+            ],
+            "serverpath": "D:/Programs/Runtimes/Debug/xpack-openocd-0.12.0-7/bin/openocd.exe",
+            "searchDir": [
+                "D:/Programs/Runtimes/Debug/xpack-openocd-0.12.0-7/openocd/scripts"
+            ],
+            "runToEntryPoint": "main",
+            "showDevDebugOutput": "none",
+            "gdbPath": "D:/Programs/Runtimes/GCC/arm-none-eabi/bin/arm-none-eabi-gdb.exe"
+        }
+    ]
+}
