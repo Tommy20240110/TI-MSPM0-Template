@@ -7,7 +7,9 @@
             "command": "${workspaceFolder}/.ti/syscfg.bat",
             "args": [
                 "${workspaceFolder}",
-                "${workspaceFolderBasename}"
+                "${workspaceFolderBasename}",
+                "D:\\Tommy\\DevTools\\TI\\Sysconfig",
+                "D:\\Tommy\\DevTools\\TI\\mspm0_sdk_2_10_00_04"
             ],
             "group": "build",
             "problemMatcher": [],

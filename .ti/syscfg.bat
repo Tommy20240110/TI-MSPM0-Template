@@ -1,9 +1,5 @@
 @echo off
 
-:: Change these paths to point to the location of the sysconfig_cli.bat file and the SDK on your machine
-set SYSCFG_PATH=D:\Programs\DevTools\TI\Sysconfig\sysconfig_cli.bat
-set SDK_ROOT=D:\Programs\DevTools\TI\mspm0_sdk_2_10_00_04
-
 :: Check arguments
 set PROJ_ROOT=%~1
 if "%PROJ_ROOT%"=="" (
@@ -14,6 +10,18 @@ if "%PROJ_ROOT%"=="" (
 set SYSCFG_NAME=%~2
 if "%SYSCFG_NAME%"=="" (
     echo .syscfg file name not provided
+    exit
+)
+
+set SYSCFG_ROOT=%~3
+if "%SYSCFG_ROOT%"=="" (
+    echo Sysconfig installation directory not provided
+    exit
+)
+
+set SDK_ROOT=%~4
+if "%SDK_ROOT%"=="" (
+    echo SDK installation directory not provided
     exit
 )
 
@@ -28,12 +36,11 @@ if not defined SYSCFG_FILE (
 )
 
 :: Search for the sysconfig_cli.bat
-if not exist "%SYSCFG_PATH%" (
+if not exist "%SYSCFG_ROOT%\sysconfig_cli.bat" (
     echo Couldn't find Sysconfig Tool
     exit
 )
-
-echo Using Sysconfig Tool from %SYSCFG_PATH%
+echo Using Sysconfig Tool from %SYSCFG_ROOT%\sysconfig_cli.bat%
 
 :: Search for the root of the SDK by going up one directory
 :: However, if we don't find it after 5 times then give up
@@ -56,7 +63,7 @@ if exist "%PROJ_ROOT%\.ti\generate" (
 )
 
 :: Here, the "call" keyword needs to be used to prevent the script from prematurely exiting
-call %SYSCFG_PATH% -o "%PROJ_ROOT%\.ti\generate" -s "%SDK_ROOT%\.metadata\product.json" --compiler gcc "%SYSCFG_FILE%"
+call "%SYSCFG_ROOT%\sysconfig_cli.bat" -o "%PROJ_ROOT%\.ti\generate" -s "%SDK_ROOT%\.metadata\product.json" --compiler gcc "%SYSCFG_FILE%"
 
 :: User's configuration
 set SYSCFG_OUTPUT_DIR=%PROJ_ROOT%\.ti\generate

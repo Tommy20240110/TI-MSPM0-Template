@@ -1,8 +1,8 @@
-# Install script for directory: C:/Users/Tommy/Desktop/Codes/Embedded C/TI/TI_MSPM0_Template
+# Install script for directory: C:/Users/Tommy/Desktop/Codes/Embedded C/TI/TI-MSPM0-Template
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/TI_MSPM0_Template")
+  set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/TI-MSPM0-Template")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -34,13 +34,13 @@ endif()
 
 # Set path to fallback-tool for dependency-resolution.
 if(NOT DEFINED CMAKE_OBJDUMP)
-  set(CMAKE_OBJDUMP "D:/Programs/Runtimes/GCC/arm-none-eabi/bin/arm-none-eabi-objdump.exe")
+  set(CMAKE_OBJDUMP "D:/Tommy/Runtimes/C-C++/Arm/arm-none-eabi-15.2/bin/arm-none-eabi-objdump.exe")
 endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
 if(CMAKE_INSTALL_LOCAL_ONLY)
-  file(WRITE "C:/Users/Tommy/Desktop/Codes/Embedded C/TI/TI_MSPM0_Template/build/install_local_manifest.txt"
+  file(WRITE "C:/Users/Tommy/Desktop/Codes/Embedded C/TI/TI-MSPM0-Template/build/install_local_manifest.txt"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
 endif()
 if(CMAKE_INSTALL_COMPONENT)
@@ -56,6 +56,6 @@ else()
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  file(WRITE "C:/Users/Tommy/Desktop/Codes/Embedded C/TI/TI_MSPM0_Template/build/${CMAKE_INSTALL_MANIFEST}"
+  file(WRITE "C:/Users/Tommy/Desktop/Codes/Embedded C/TI/TI-MSPM0-Template/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
 endif()

@@ -27,7 +27,7 @@ set(ELF_FILE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_NAME}.elf) # 可执行�
 
 # 源文件
 file(GLOB_RECURSE SRC_FILES
-    ${CMAKE_SOURCE_DIR}/Application/*.c
+    ${CMAKE_SOURCE_DIR}/User/*.c
     ${CMAKE_SOURCE_DIR}/Core/*.c
 )
 
@@ -43,7 +43,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     # $ENV{ARM_GCC_ROOT}/arm-none-eabi/include
     ${CMAKE_SOURCE_DIR}/Drivers/third_party/CMSIS/Core/Include
     ${CMAKE_SOURCE_DIR}/Drivers
-    ${CMAKE_SOURCE_DIR}/Application/Driver
+    ${CMAKE_SOURCE_DIR}/User/Driver
     ${CMAKE_SOURCE_DIR}/Core/Inc
 )
 

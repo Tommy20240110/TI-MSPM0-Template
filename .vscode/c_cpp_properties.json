@@ -1,21 +1,19 @@
 {
     "version": 4,
-    "env": {
-        "ARM_GCC_PATH": "D:/Programs/Runtimes/GCC/arm-none-eabi/bin"
-    },
     "configurations": [
         {
             "name": "TI MSPM0G3507",
             "includePath": [
                 "${workspaceFolder}/Drivers/third_party/CMSIS/Core/Include",
                 "${workspaceFolder}/Drivers",
-                "${workspaceFolder}/Application/Driver",
+                "${workspaceFolder}/User/Application",
+                "${workspaceFolder}/User/Driver",
                 "${workspaceFolder}/Core/Inc"
             ],
             "defines": [
                 "__MSPM0G3507__"
             ],
-            "compilerPath": "${env:ARM_GCC_PATH}/arm-none-eabi-gcc.exe",
+            "compilerPath": "arm-none-eabi-gcc.exe",
             "intelliSenseMode": "windows-gcc-arm"
         }
     ]

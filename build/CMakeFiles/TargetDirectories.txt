@@ -1,3 +1,3 @@
-C:/Users/Tommy/Desktop/Codes/Embedded C/TI/TI_MSPM0_Template/build/CMakeFiles/TI_MSPM0_Template.dir
-C:/Users/Tommy/Desktop/Codes/Embedded C/TI/TI_MSPM0_Template/build/CMakeFiles/edit_cache.dir
-C:/Users/Tommy/Desktop/Codes/Embedded C/TI/TI_MSPM0_Template/build/CMakeFiles/rebuild_cache.dir
+C:/Users/Tommy/Desktop/Codes/Embedded C/TI/TI-MSPM0-Template/build/CMakeFiles/TI-MSPM0-Template.dir
+C:/Users/Tommy/Desktop/Codes/Embedded C/TI/TI-MSPM0-Template/build/CMakeFiles/edit_cache.dir
+C:/Users/Tommy/Desktop/Codes/Embedded C/TI/TI-MSPM0-Template/build/CMakeFiles/rebuild_cache.dir
