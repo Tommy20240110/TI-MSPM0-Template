@@ -1,0 +1,12 @@
+{
+    // TI
+    "ti.sysconfig.root": "path/to/your/sysconfig",
+    "ti.sdk.root": "path/to/your/sdk",
+    
+    // CMake
+    "cmake.generator": "Ninja",
+    "cmake.automaticReconfigure": false,
+    "cmake.configureOnOpen": false,
+    "cmake.configureOnEdit": false,
+    "cmake.buildTask": true,
+}

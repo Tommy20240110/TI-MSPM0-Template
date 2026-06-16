@@ -8,28 +8,39 @@
             "args": [
                 "${workspaceFolder}",
                 "${workspaceFolderBasename}",
-                "D:\\Tommy\\DevTools\\TI\\Sysconfig",
-                "D:\\Tommy\\DevTools\\TI\\mspm0_sdk_2_10_00_04"
+                "${config:ti.sysconfig.root}",
+                "${config:ti.sdk.root}"
             ],
-            "group": "build",
-            "problemMatcher": [],
-            "detail": "Compile the .syscfg file and copy the necessary files"
+            "problemMatcher": []
         },
         {
             "label": "CMake configure",
-            "type": "cmake",
-            "command": "configure",
-            "targets": ["${workspaceFolderBasename}"],
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--preset", "user-debug"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
             "problemMatcher": []
         },
         {
             "label": "CMake build",
             "type": "cmake",
             "command": "build",
-            "targets": ["${workspaceFolderBasename}"],
-            "dependsOn": ["CMake configure"],
+            "targets": [
+                "${workspaceFolderBasename}"
+            ],
+            "dependsOn": [
+                "TI Sysconfig build",
+                "CMake configure"
+            ],
             "dependsOrder": "sequence",
-            "group": "build",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
             "problemMatcher": [],
         },
         {

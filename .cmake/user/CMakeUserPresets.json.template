@@ -1,0 +1,29 @@
+{
+    "version": 6,
+    "configurePresets": [
+        {
+            "name": "user-debug",
+            "inherits": "debug",
+            "displayName": "User Debug",
+            "description": "Debug configuration with user's SDK path",
+            "cacheVariables": {
+                "TI_SDK_ROOT": {
+                    "type": "PATH",
+                    "value": "path/to/your/sdk"
+                }
+            }
+        },
+        {
+            "name": "user-release",
+            "inherits": "release",
+            "displayName": "User Release",
+            "description": "Release configuration with user's SDK path",
+            "cacheVariables": {
+                "TI_SDK_ROOT": {
+                    "type": "PATH",
+                    "value": "path/to/your/sdk"
+                }
+            }
+        }
+    ]
+}

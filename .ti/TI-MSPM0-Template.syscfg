@@ -12,7 +12,6 @@
 const Board         = scripting.addModule("/ti/driverlib/Board");
 const GPIO          = scripting.addModule("/ti/driverlib/GPIO", {}, false);
 const GPIO1         = GPIO.addInstance();
-const NONMAIN       = scripting.addModule("/ti/driverlib/NONMAIN");
 const SYSCTL        = scripting.addModule("/ti/driverlib/SYSCTL");
 const ProjectConfig = scripting.addModule("/ti/project_config/ProjectConfig");
 
@@ -31,7 +30,6 @@ multiplier2.multiplyValue = 10;
 const mux8       = system.clockTree["HSCLKMUX"];
 mux8.inputSelect = "HSCLKMUX_SYSPLL0";
 
-Board.globalFastWakeEn       = true;
 Board.configureUnused        = true;
 Board.unusedDirection        = "INPUT";
 Board.unusedInternalResistor = "PULL_UP";
@@ -44,8 +42,6 @@ GPIO1.$name                          = "GPIO_GRP_0";
 GPIO1.associatedPins[0].$name        = "PIN_0";
 GPIO1.associatedPins[0].assignedPort = "PORTA";
 GPIO1.associatedPins[0].assignedPin  = "0";
-
-NONMAIN.nonmainWarning = true;
 
 SYSCTL.clockTreeEn = true;
 

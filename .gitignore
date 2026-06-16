@@ -1,2 +1,13 @@
-
+/CMakePresets.json
+/CMakeUserPresets.json
+.cmake/toolchain/toolchain_mspm0g3507.cmake
+.ti/generate/
+.vscode/*.json
+!.vscode/tasks.json
 build/
+Core/Inc/*
+Core/Src/*
+Core/Startup/*
+!Core/*/*.empty
+User/*
+!User/*.empty

@@ -92,15 +92,4 @@ if exist "%SYSCFG_OUTPUT_DIR%\*.h" (
     exit
 )
 
-:: TODO: Search for the essential files and add them to the PATH
-set CMSIS_SRC_DIR=%SDK_ROOT%\source\third_party\CMSIS\Core\Include
-set CMSIS_DST_DIR=%PROJ_ROOT%\Drivers\third_party\CMSIS\Core\Include
-if exist "%CMSIS_SRC_DIR%" (
-    if not exist "%CMSIS_DST_DIR%" mkdir "%CMSIS_DST_DIR%"
-    xcopy /Y /E "%CMSIS_SRC_DIR%\*" "%CMSIS_DST_DIR%\" >nul 2>&1
-) else (
-    echo WARNING: CMSIS source not found at %CMSIS_SRC_DIR%
-    exit
-)
-
 echo File organization completed!
