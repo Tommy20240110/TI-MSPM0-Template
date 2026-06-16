@@ -1,7 +1,0 @@
-# ninja log v7
-15	68	8019181503460468	CMakeFiles/TI-MSPM0-Template.dir/User/Application/interrupt.c.obj	e5ca504653e7cf70
-10	69	8019181503407396	CMakeFiles/TI-MSPM0-Template.dir/Core/Startup/startup_mspm0g350x_gcc.c.obj	fe699f18c5492d13
-1	166	8019181503318609	CMakeFiles/TI-MSPM0-Template.dir/Core/Src/boot_config.c.obj	ff839e9d1596181c
-21	173	8019181503524838	CMakeFiles/TI-MSPM0-Template.dir/User/Application/main.c.obj	6ad1ea93c2d4a02c
-5	183	8019181503369558	CMakeFiles/TI-MSPM0-Template.dir/Core/Src/ti_msp_dl_config.c.obj	522792446820d96d
-183	537	8019181505141502	outputs/TI-MSPM0-Template.elf	e008c845b05930fd

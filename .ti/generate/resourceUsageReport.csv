@@ -1,8 +1,0 @@
-Pin Number,Device Pin Name,IO Type,Assigned Peripheral,Assigned Function ,User Label
-33,PA0,OD,GPIO,Open-Drain Output,PIN_0
-13,PA20,SD,BOARD,"Debug Clock",
-12,PA19,HS,BOARD,"Debug Data In Out",
-
-
-Peripheral,Usage
-

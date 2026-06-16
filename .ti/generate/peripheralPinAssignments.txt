@@ -1,8 +1,0 @@
-
-- GPIOA:
-	+ Open-Drain Output: PA0
-- SYSCTL
-- EVENT
-- BOARD:
-	+ Debug Clock: PA20
-	+ Debug Data In Out: PA19
