@@ -8,7 +8,7 @@
             "binaryDir": "${sourceDir}/build",
             "cacheVariables": {
                 "PROJECT_NAME": "${sourceDirName}",
-                "CHIP": "Please enter the chip code such as mspm0g3507"
+                "CHIP_MODEL": "@CHIP_MODEL@"
             }
         },
         {

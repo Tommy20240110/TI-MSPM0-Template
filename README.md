@@ -1,255 +1,513 @@
-# TI MSPM0 GCC + CMake + Ninja 嵌入式工程模板
+# TI MSPM0 通用工程模板
 
-基于 TI MSPM0 系列 MCU 的嵌入式 C 语言工程模板，使用 **GCC 交叉编译工具链** + **CMake** + **Ninja** 构建系统。
+这是一个面向 TI MSPM0 系列 MCU 的通用嵌入式工程模板，集成了：
 
----
+- TI SysConfig 外设配置与代码生成
+- Arm GNU Toolchain（`arm-none-eabi-gcc`）
+- CMake + Ninja 构建系统
+- VS Code IntelliSense、构建任务与 Cortex-Debug 调试
+- OpenOCD 烧录与调试
+- DAPLink、J-Link 和 XDS110 调试器配置
+- 根据芯片型号自动选择架构、启动文件和 DriverLib
+
+首次克隆工程后，只需运行一次配置脚本并填写本机工具路径，即可完成代码生成、编译、烧录和调试。
+
+## 工作流程
+
+```text
+configure.bat
+    ↓
+生成本机配置、CMake Preset、工具链和 VS Code 配置
+    ↓
+syscfg.bat
+    ↓
+SysConfig 生成外设代码、链接脚本和库依赖
+    ↓
+CMake + Ninja
+    ↓
+生成 ELF、HEX 和 MAP
+    ↓
+OpenOCD + 调试器
+    ↓
+烧录并进入源码调试
+```
 
 ## 环境要求
 
-| 工具 | 最低版本 | 说明 |
-|---|---|---|
-| arm-none-eabi-gcc | ≥ 15.2 | ARM GCC 交叉编译器（需加入系统环境） |
-| CMake | ≥ 3.28 | 构建系统生成器 |
-| Ninja | ≥ 1.13 | 高性能构建执行器 |
-| TI MSPM0 SDK | ≥ 2.10 | 芯片驱动库及外设驱动 |
-| SysConfig | ≥ 1.27 | TI 外设图形化配置工具 |
+本模板主要面向 Windows 环境。
 
----
+工程采用以下开发与调试环境：
 
-## 目录结构
-
-```
-.
-├── .cmake/
-│   ├── presets/
-│   │   └── CMakePresets.json.template ← CMakePresets.json 模板
-│   ├── toolchain/
-│   │   └── toolchain.cmake.template   ← 芯片工具链定义
-│   ├── user/
-│   │   └── CMakeUserPresets.json.template ← CMakeUserPresets.json 模板
-│   └── link_syscfg_libs.cmake ← 自动解析 SysConfig 生成的库依赖
-│
-├── .ti/
-│   ├── TI-MSPM0-Template.syscfg ← SysConfig 外设配置文件
-│   ├── syscfg.bat             ← SysConfig 一键生成脚本
-│   └── generate/              ← SysConfig 生成的代码（gitignore）
-│
-├── Core/
-│   ├── Inc/                   ← SysConfig 生成的头文件
-│   ├── Src/                   ← SysConfig 生成的源文件
-│   └── Startup/               ← 芯片启动文件
-│
-├── User/
-├── .vscode/
-│   ├── template
-│   │   ├── settings.json.template ← settings.json 模板
-│   │   └── c_cpp_properties.json.template ← c_cpp_properties.json 模板
-│   ├── tasks.json             ← 一键构建任务链
-│   ├── launch.json            ← 调试配置（待更新）
-│   ├── settings.json          ← 工作区设置（用户个性化）
-│   └── c_cpp_properties.json  ← IntelliSense 配置（用户个性化）
-│
-├── CMakePresets.json          ← CMake 预设（项目共用）
-├── CMakeUserPresets.json      ← 用户本地配置（gitignore）
-├── CMakeLists.txt             ← 顶层构建文件
-└── README.md
+```text
+TI SysConfig + CMake + Ninja + GCC + OpenOCD
 ```
 
----
+各工具的职责如下：
 
-## 快速开始
+| 工具 | 作用 |
+| --- | --- |
+| TI SysConfig | 生成外设初始化代码和链接配置 |
+| TI MSPM0 SDK | 提供设备头文件、DriverLib 和启动文件 |
+| Arm GNU Toolchain | 编译、链接和 GDB 调试 |
+| CMake 3.28 或更高版本 | 生成构建系统 |
+| Ninja | 执行构建 |
+| OpenOCD | 烧录并提供 GDB Server |
+| VS Code（可选） | 编辑、构建和图形化调试 |
 
-### 1. 安装工具链
+目前已验证的调试器兼容性：
 
-确保 `arm-none-eabi-gcc` 已加入系统环境，验证：
+| 调试器 | OpenOCD 烧录 | 说明 |
+| --- | --- | --- |
+| DAPLink / CMSIS-DAP | 可用 | 可直接通过 SWD 正常烧录 |
+| XDS110 | 可用 | 可直接通过 OpenOCD 正常烧录 |
+| J-Link | 可用，但需调整驱动 | 使用 OpenOCD 前通常需要将 J-Link USB 接口更换为 WinUSB 或 libusb 兼容驱动 |
 
-```bash
-arm-none-eabi-gcc --version
+如果使用 VS Code，建议安装：
+
+- C/C++
+- CMake Tools
+- Cortex-Debug
+
+安装后可在终端检查基础工具：
+
+```powershell
 cmake --version
 ninja --version
 ```
 
-### 2. 配置 CMakeUserPresets.json
+Arm GCC 和 OpenOCD 不要求加入系统 `PATH`，配置脚本会记录它们的安装路径。
 
-复制模板并填入你的 SDK 路径：
+## 目录结构
 
-```bash
-cp CMakeUserPresets.json.template CMakeUserPresets.json
+```text
+.
+├─ .cmake/
+│  ├─ template/                  CMake 配置模板
+│  ├─ toolchain/                 生成的本机工具链文件
+│  └─ utils/                     SysConfig 库解析工具
+├─ .ti/
+│  ├─ TI-MSPM0-Template.syscfg   SysConfig 工程
+│  ├─ syscfg.bat                 SysConfig 代码生成脚本
+│  └─ generate/                  SysConfig 中间生成文件
+├─ .vscode/
+│  ├─ template/                  VS Code 配置模板
+│  ├─ openocd_daplink.cfg        DAPLink 配置
+│  ├─ openocd_jlink.cfg          J-Link 配置
+│  └─ openocd_xds110.cfg         XDS110 配置
+├─ Core/
+│  ├─ Inc/                       SysConfig 生成的头文件
+│  ├─ Src/                       SysConfig 生成的源文件
+│  └─ Startup/                   对应芯片的 GCC 启动文件
+├─ User/                         用户应用代码
+├─ scripts/
+│  ├─ configure.bat              首次配置脚本
+│  ├─ config.ini                 生成的本机配置
+│  └─ mspm0_chip_db.csv          芯片参数数据库
+├─ CMakeLists.txt
+├─ CMakePresets.json             生成的项目级 Preset
+└─ CMakeUserPresets.json         生成的本机路径 Preset
 ```
 
-编辑 `CMakeUserPresets.json`，将 `TI_SDK_ROOT` 指向你本地的 TI MSPM0 SDK。
+## 快速开始
 
-### 3. 选择芯片
+下面的流程假设工程已经从 Git 克隆到本地。
 
-本项目支持多芯片切换。打开 `CMakePresets.json`，确认 `CHIP` 值：
+### 1. 运行配置脚本
 
-```json
-"CHIP": "mspm0g3507"
+可以双击：
+
+```text
+scripts\configure.bat
 ```
 
-如需使用其他芯片，改为对应的芯片代号，并在 `.cmake/toolchain/` 下创建对应的 `toolchain_<CHIP>.cmake`。
+也可以在工程根目录打开 PowerShell：
 
-### 4. 配置 VS Code IntelliSense（可选）
-
-复制模板：
-
-```bash
-cp .vscode/c_cpp_properties.json.template .vscode/c_cpp_properties.json
-cp .vscode/settings.json.template .vscode/settings.json
+```powershell
+.\scripts\configure.bat
 ```
 
-- `c_cpp_properties.json`：将 `myDeviceDefines` 改为你芯片对应的宏（如 `__MSPM0G3507__`）
-- `settings.json`：根据你的环境修改 TI SDK 路径、SysConfig 路径、调试器路径等
+首次运行时选择重新配置：
 
-### 5. 构建
+```text
+Do you want to reconfigure? (Y/N): Y
+```
 
-**VS Code：** 按 `Ctrl+Shift+B` 一键构建（依次执行：SysConfig → CMake 配置 → 编译 → 生成 .hex）
+随后依次输入本机安装路径：
 
-**命令行：**
+```text
+TI Sysconfig path:              D:\Tools\TI\Sysconfig
+TI MSPM0 SDK path:              D:\Tools\TI\mspm0_sdk_2_10_00_04
+GCC path:                       D:\Tools\ArmGNU
+OpenOCD path:                   D:\Tools\OpenOCD
+Enter chip model:               MSPM0G3507
+```
 
-```bash
+路径既可以使用 `\`，也可以使用 `/`。脚本会自动将路径转换为工程配置所需的格式。
+
+芯片型号不区分大小写，但必须存在于
+[`scripts/mspm0_chip_db.csv`](scripts/mspm0_chip_db.csv) 中。例如：
+
+```text
+MSPM0G3507
+mspm0g3507
+```
+
+如果输入了不存在的型号，脚本会停止并提示：
+
+```text
+ERROR: Chip model "..." not found in database!
+```
+
+重新运行脚本并输入正确型号即可。
+
+脚本识别芯片后会自动完成：
+
+1. 生成 `CMakePresets.json`
+2. 生成 `CMakeUserPresets.json`
+3. 生成 `.cmake/toolchain/toolchain.cmake`
+4. 生成 `scripts/config.ini`
+5. 从 TI SDK 复制对应芯片的 GCC 启动文件
+
+当脚本询问是否生成 VS Code 配置时，推荐输入：
+
+```text
+Do you want to generate VS Code configuration? (Y/N): Y
+```
+
+随后会生成：
+
+- `.vscode/c_cpp_properties.json`
+- `.vscode/launch.json`
+- `.vscode/tasks.json`
+
+这些文件包含本机绝对路径，因此默认不会提交到 Git。
+
+### 2. 运行 SysConfig
+
+在工程根目录执行：
+
+```powershell
+.\.ti\syscfg.bat
+```
+
+脚本会调用 TI SysConfig CLI，并将主要文件整理到以下位置：
+
+```text
+Core/Src/ti_msp_dl_config.c
+Core/Inc/ti_msp_dl_config.h
+.ti/generate/device_linker.lds
+.ti/generate/device.opt
+.ti/generate/device.lds.genlibs
+```
+
+看到下面的输出表示生成成功：
+
+```text
+SysConfig Complete!
+```
+
+SysConfig 输出的 `info` 通常是芯片使用建议，不代表生成失败。应以脚本退出状态和是否生成上述文件为准。
+
+### 3. 配置 CMake
+
+Debug 构建：
+
+```powershell
+cmake --preset user-debug
+```
+
+Release 构建：
+
+```powershell
+cmake --preset user-release
+```
+
+配置成功后，构建文件位于 `build/`。
+
+### 4. 编译工程
+
+```powershell
+cmake --build build
+```
+
+构建产物位于：
+
+```text
+build/outputs/<工程目录名>.elf
+build/outputs/<工程目录名>.hex
+build/outputs/<工程目录名>.map
+```
+
+其中：
+
+- `ELF` 用于烧录和源码调试
+- `HEX` 用于固件烧录
+- `MAP` 用于分析符号和内存占用
+
+裸机工程使用 `nosys.specs` 时，链接器可能提示 `_read`、`_write`、`_close` 或 `_lseek` 未实现。如果工程没有使用对应的标准输入输出功能，这些警告不影响固件生成。
+
+## 使用 VS Code 一键构建
+
+完成首次配置后，在 VS Code 中按：
+
+```text
+Ctrl + Shift + B
+```
+
+默认的 `CMake build` 任务会依次执行：
+
+```text
+TI Sysconfig Prebuild
+    ↓
+CMake configure
+    ↓
+CMake build
+```
+
+也可以通过“终端 → 运行任务”单独执行：
+
+- `Project Configure`
+- `TI Sysconfig Prebuild`
+- `CMake configure`
+- `CMake build`
+- `CMake clean`
+- `CMake clean rebuild`
+- `Flash (DAPLink)`
+- `Flash (J-Link)`
+- `Flash (XDS110)`
+
+## 使用 DAPLink 烧录
+
+连接 DAPLink 与目标板，并确认 SWDIO、SWCLK、GND 和目标板供电连接正确。
+
+在 VS Code 中运行：
+
+```text
+Flash (DAPLink)
+```
+
+或者在工程根目录手动执行：
+
+```powershell
+& "D:\Tools\OpenOCD\bin\openocd.exe" `
+  -s "D:\Tools\OpenOCD\openocd\scripts" `
+  -f ".vscode\openocd_daplink.cfg" `
+  -c "program build/outputs/TI-MSPM0-Template.elf verify reset exit"
+```
+
+请将示例中的 OpenOCD 路径和 ELF 文件名替换为自己的实际值。
+
+成功时应看到类似输出：
+
+```text
+CMSIS-DAP: Interface ready
+Cortex-M0+ processor detected
+Programming Finished
+Verified OK
+Resetting Target
+```
+
+## 使用 XDS110 烧录
+
+XDS110 已经过 OpenOCD 实际烧录验证。连接目标板后，可以在 VS Code 中运行：
+
+```text
+Flash (XDS110)
+```
+
+对应的 OpenOCD 配置文件为：
+
+```text
+.vscode/openocd_xds110.cfg
+```
+
+## 使用 J-Link 烧录
+
+模板包含 J-Link 的 OpenOCD 配置：
+
+```text
+.vscode/openocd_jlink.cfg
+```
+
+但 Windows 默认安装的 SEGGER J-Link 驱动通常不能被 OpenOCD 的
+`libusb` 接口直接使用。使用 `Flash (J-Link)` 前，可能需要通过以下工具更换驱动：
+
+- USBDriverTool
+- Zadig
+
+通常可将对应的 J-Link USB 接口驱动更换为：
+
+- WinUSB
+- libusbK
+
+更换驱动后，重新连接 J-Link，再运行：
+
+```text
+Flash (J-Link)
+```
+
+> 注意：更换 J-Link 驱动后，SEGGER J-Link Commander、Ozone 或其他官方工具可能无法继续识别设备。需要使用 SEGGER 工具时，请在 USBDriverTool、Zadig 或 Windows 设备管理器中恢复原来的 SEGGER 驱动。更换驱动前应确认选择的是 J-Link 对应接口，避免误操作其他 USB 设备。
+
+## 使用 VS Code 调试
+
+1. 连接调试器和目标板。
+2. 确认工程已经成功编译。
+3. 打开 VS Code 的“运行和调试”面板。
+4. 选择 `Debug (DAPLink)`。
+5. 按 `F5`。
+
+调试配置会启动 OpenOCD、连接 `arm-none-eabi-gdb`、下载 ELF，并运行到 `main`。
+
+成功后可以：
+
+- 在 C/C++ 源码中设置断点
+- 单步执行
+- 查看局部变量和全局变量
+- 查看寄存器
+- 查看调用栈
+- 查看内存
+
+使用 XDS110 时选择 `Debug (XDS110)`；J-Link 完成上述驱动调整后，选择
+`Debug (J-Link)`。
+
+## 更换芯片
+
+重新运行：
+
+```powershell
+.\scripts\configure.bat
+```
+
+选择 `Y` 重新配置，并输入新的芯片型号。脚本会根据
+`scripts/mspm0_chip_db.csv` 自动更新：
+
+- 芯片宏定义
+- 芯片家族
+- Cortex-M 内核和 ARM 架构参数
+- 浮点 ABI
+- GCC 启动文件
+- CMake 配置
+- VS Code 配置
+
+更换芯片后还应检查 `.ti/*.syscfg` 是否与新器件匹配，然后重新执行：
+
+```powershell
+.\.ti\syscfg.bat
 cmake --preset user-debug
 cmake --build build
 ```
 
-编译产物在 `build/output/` 下：
-- `*.elf` — 可执行文件
-- `*.hex` — 固件（用于烧录）
-- `*.map` — 链接映射表（内存分析用）
+## 修改外设配置
 
----
+使用 TI SysConfig 打开：
 
-## 芯片切换
-
-通过 `CHIP` 变量选择目标芯片，工具链文件按 `toolchain_<CHIP>.cmake` 命名存放于 `.cmake/toolchain/`。
-
-**切换方式：**
-
-```bash
-# 命令行
-cmake -B build -G Ninja -DCHIP=mspm0g3507 -DTI_SDK_ROOT="..."
-
-# 或在 CMakePresets.json / CMakeUserPresets.json 中设置
-"CHIP": "mspm0g3507"
+```text
+.ti\TI-MSPM0-Template.syscfg
 ```
 
-**添加新芯片：**
+修改引脚、时钟或外设后保存文件，再运行：
 
-1. 在 `.cmake/toolchain/` 下创建 `toolchain_<chip>.cmake`，定义编译器、CPU 架构、链接脚本等
-2. 可选：添加对应的 SysConfig `.syscfg` 文件
-3. 设置 `CHIP` 变量为新芯片名即可
-
-> 未设置 `CHIP` 时，配置阶段会报错提示，避免无默认值的隐式行为。
-
----
-
-## CMake 架构
-
-```
-CMakePresets.json  ──── 项目级预设（生成器、构建目录、CHIP）
-        +
-CMakeUserPresets.json ── 用户级预设（TI_SDK_ROOT 等本地路径）
-        │
-        ▼
-toolchain_<CHIP>.cmake ── 交叉编译环境（编译器、架构标志、链接脚本）
-        │
-        ▼
-CMakeLists.txt  ───────── 源文件、头文件路径、链接库
-        │
-        ▼
-link_syscfg_libs.cmake ── 解析 SysConfig 生成的 device.lds.genlibs，
-                          自动检查并链接存在的库文件
+```powershell
+.\.ti\syscfg.bat
+cmake --build build
 ```
 
-**执行流程：**
+不要直接长期修改 `Core/Src/ti_msp_dl_config.c` 或
+`Core/Inc/ti_msp_dl_config.h`，因为再次运行 SysConfig 时这些文件会被重新生成。
 
-```
-cmake --preset user-debug
-  ① 读取 CMakePresets.json + CMakeUserPresets.json → CHIP、TI_SDK_ROOT
-  ② 加载 toolchain_<CHIP>.cmake → 编译器、架构、链接脚本
-  ③ 执行 CMakeLists.txt → project() → 编译 → 链接 → .hex
-```
-
----
-
-## SysConfig
-
-SysConfig 是 TI 的外设图形化配置工具，生成芯片初始化代码和链接脚本。
-
-**用法：**
-
-```bash
-# 手动运行
-.ti/syscfg.bat <工程目录> <.syscfg文件名> <SysConfig安装目录> <SDK目录>
-```
-
-**genLib\* 开关：**
-
-在 `.syscfg` 文件中通过 `ProjectConfig.genLibXxx = true/false` 控制各中间件库的启用。
-
-| 标志 | 说明 | GCC 兼容性 |
-|---|---|---|
-| `genLibDrivers` | TI Drivers 驱动库 | ✅ |
-| `genLibIQ` | IQMath 定点数学库 | ✅ |
-| `genLibGC` | GUI Composer 图形库 | ✅ |
-| `genLibModbus` | Modbus 协议库 | ✅ |
-| `genLibSMBUS` | SMBus 通信库 | ✅（注意编译器格式） |
-| `genLibCMSIS` | CMSIS 头文件 | ✅（仅头文件） |
-| `genLibGaugeL2` | 电池电量库 | ⚠️ 需确认 GCC 版本 |
-| `genLibMC` | 电机控制库 | ❌ 无 GCC 预编译库 |
-
-`link_syscfg_libs.cmake` 会自动解析 SysConfig 生成的 `device.lds.genlibs`，逐条检查库文件是否存在。存在则链接，不存在则报错提示用户在 `.syscfg` 中关闭对应功能。
-
----
-
-## VS Code 集成
-
-### 构建任务（tasks.json）
-
-`Ctrl+Shift+B` 触发三级任务链：
-
-```
-SysConfig 生成 → CMake 配置 → 编译 + 链接 + .hex
-```
-
-### 个性化配置文件
-
-项目采用模板分离用户个性化配置：
-
-| 文件 | 用途 | 是否 gitignore | 模板 |
-|---|---|---|---|
-| `settings.json` | 工作区设置（SDK 路径、调试器路径等） | 否 | `settings.json.template` |
-| `c_cpp_properties.json` | IntelliSense 配置（芯片宏定义、头文件路径） | 否 | `c_cpp_properties.json.template` |
-| `CMakeUserPresets.json` | 用户 CMake 预设（`TI_SDK_ROOT`） | 是 | `CMakeUserPresets.json.template` |
-
-使用流程：
-
-1. 复制模板文件：`cp xxx.json.template xxx.json`
-2. 根据你的环境修改其中的占位项（如 SDK 路径、芯片宏定义等）
-3. `settings.json` 中的 `ti.device`、`ti.sysconfig.root`、`ti.sdk.root` 会被其他配置文件通过 `${config:ti.*}` 引用
-
-### 调试配置（待更新）
-
-`launch.json` 中的调试器配置（J-Link / OpenOCD）正在完善中。
-
----
+用户自己的业务代码建议放在 `User/` 目录。
 
 ## 常见问题
 
-### CMake Tools 按钮配置失败
+### `config.ini not found`
 
-CMake Tools 扩展的 "Delete cache and reconfigure" 按钮可能不适用本项目的 preset 机制。
-建议使用 `Ctrl+Shift+B`（基于 tasks.json 的构建任务），或命令行：
+尚未完成首次配置。运行：
 
-```bash
-cmake --preset user-debug && cmake --build build
+```powershell
+.\scripts\configure.bat
 ```
 
-### 链接时报 ARM/Thumb 错误
+### 找不到 `sysconfig_cli.bat`
 
-确认 `toolchain_<CHIP>.cmake` 中包含了 `-mthumb` 标志，并且启动文件与应用程序编译模式一致。对于 Cortex-M 系列，所有代码必须为 Thumb 模式。
+填写的 SysConfig 路径不正确。确认填写的是 TI Sysconfig 根目录。
 
-### 找不到 driverlib.a
+### 找不到 `.metadata\product.json`
 
-确认 `CMakeUserPresets.json` 中的 `TI_SDK_ROOT` 指向正确的 SDK 路径。
-`link_syscfg_libs.cmake` 会自动从 SysConfig 生成的配置中找到并链接 driverlib。
+TI MSPM0 SDK 路径不正确，或者 SDK 安装不完整。确认填写的是 MSPM0 SDK 根目录。
+
+### 找不到 `arm-none-eabi-gcc.exe`
+
+检查 GCC 安装目录中是否存在：
+
+```text
+bin\arm-none-eabi-gcc.exe
+bin\arm-none-eabi-gdb.exe
+```
+
+然后重新运行配置脚本。
+
+### CMake 找不到 DriverLib
+
+确认 TI SDK 路径正确，并先运行：
+
+```powershell
+.\.ti\syscfg.bat
+```
+
+模板会读取 `.ti/generate/device.lds.genlibs` 并自动链接 SysConfig 请求的库。
+
+### OpenOCD 找不到 DAPLink
+
+检查：
+
+- DAPLink 是否已连接电脑
+- USB 驱动是否正常
+- 调试器是否被其他程序占用
+- SWDIO、SWCLK 和 GND 是否连接正确
+- 目标板是否供电
+
+### OpenOCD 找不到 J-Link
+
+如果 J-Link 能被 SEGGER 官方工具识别，但 OpenOCD 无法识别，通常是 USB 驱动不兼容。
+
+可使用 USBDriverTool 或 Zadig，将 J-Link 对应接口更换为 WinUSB 或 libusbK 驱动。操作时务必确认设备和接口选择正确。
+
+如果更换后 SEGGER 官方工具无法识别 J-Link，需要恢复原来的 SEGGER 驱动。
+
+### OpenOCD 提示未设置 adapter speed
+
+模板未强制指定调试时钟时，OpenOCD 会回退到较低速率，例如 `100 kHz`。这通常仍可正常调试，只是烧录和下载速度较慢。
+
+如需提高速度，可在对应的 OpenOCD 配置文件中加入合适的速率，例如：
+
+```tcl
+adapter speed 1000
+```
+
+具体速率取决于调试器、接线质量和目标板。
+
+### VS Code 配置文件是否乱码
+
+生成的 `.vscode/*.json` 应使用 UTF-8 编码。`settings.json` 是 VS Code 支持的 JSONC 格式，允许注释和尾逗号；某些严格 JSON 检查器可能会报告语法错误，但这不代表文件乱码。
+
+## 已验证配置
+
+本模板已经使用以下组合完成实际验证：
+
+- MSPM0G3507
+- TI MSPM0 SDK 2.10.00.04
+- Arm GNU Toolchain 15.2
+- CMake + Ninja
+- OpenOCD
+- DAPLink / CMSIS-DAP / SWD：烧录和 GDB 调试通过
+- XDS110：OpenOCD 烧录通过
+- J-Link：模板已提供配置，使用 OpenOCD 时需要更换兼容的 USB 驱动
+
+验证内容包括：
+
+- SysConfig 成功生成代码
+- CMake 成功配置和编译
+- 成功生成 ELF、HEX 和 MAP
+- OpenOCD 成功识别 Cortex-M0+
+- 固件烧录并校验通过
+- GDB 成功连接目标并停在 `main`
