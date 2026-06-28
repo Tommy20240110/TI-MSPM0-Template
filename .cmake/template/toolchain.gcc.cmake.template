@@ -1,0 +1,115 @@
+# TOOLCHAIN: GCC ARM
+# Target system
+set(CMAKE_SYSTEM_NAME      Generic)
+set(CMAKE_SYSTEM_PROCESSOR arm)
+
+# Required paths
+if(NOT DEFINED TI_SDK_ROOT)
+    message(FATAL_ERROR "Set TI_SDK_ROOT in CMakeUserPresets.json")
+endif()
+
+if(NOT DEFINED GCC_ROOT)
+    message(FATAL_ERROR "Set GCC_ROOT in CMakeUserPresets.json")
+endif()
+
+# Chip parameters (substituted by configure.bat/.sh)
+set(CHIP_MODEL  "@CHIP_MODEL@")
+set(CHIP_FAMILY "@CHIP_FAMILY@")
+set(CORE        "@CORE@")
+set(ARCH        "@ARCH@")
+set(FLOAT_ABI   "@FLOAT_ABI@")
+
+# Link driver (always gcc for GCC compiler)
+set(LINK_DRIVER "gcc")
+
+# Chip-related paths
+set(CHIP_LIB_PATH  "${TI_SDK_ROOT}/source/ti/driverlib/lib/gcc/m0p/${CHIP_FAMILY}")
+set(LINKER_SCRIPT  "${CMAKE_SOURCE_DIR}/.ti/generate/device_linker.lds")
+set(GENLIBS_SCRIPT "${CMAKE_SOURCE_DIR}/.ti/generate/device.lds.genlibs")
+set(OPT_SCRIPT     "${CMAKE_SOURCE_DIR}/.ti/generate/device.opt")
+
+# GCC toolchain binaries
+set(GCC_BIN_DIR "${GCC_ROOT}/bin")
+find_program(CMAKE_C_COMPILER   NAMES arm-none-eabi-gcc      PATHS "${GCC_BIN_DIR}" NO_DEFAULT_PATH REQUIRED)
+find_program(CMAKE_CXX_COMPILER NAMES arm-none-eabi-g++      PATHS "${GCC_BIN_DIR}" NO_DEFAULT_PATH REQUIRED)
+find_program(CMAKE_ASM_COMPILER NAMES arm-none-eabi-gcc      PATHS "${GCC_BIN_DIR}" NO_DEFAULT_PATH REQUIRED)
+find_program(CMAKE_OBJCOPY      NAMES arm-none-eabi-objcopy  PATHS "${GCC_BIN_DIR}" NO_DEFAULT_PATH REQUIRED)
+find_program(CMAKE_OBJDUMP      NAMES arm-none-eabi-objdump  PATHS "${GCC_BIN_DIR}" NO_DEFAULT_PATH REQUIRED)
+find_program(CMAKE_SIZE         NAMES arm-none-eabi-size     PATHS "${GCC_BIN_DIR}" NO_DEFAULT_PATH REQUIRED)
+find_program(CMAKE_NM           NAMES arm-none-eabi-nm       PATHS "${GCC_BIN_DIR}" NO_DEFAULT_PATH REQUIRED)
+find_program(CMAKE_LINKER       NAMES arm-none-eabi-ld       PATHS "${GCC_BIN_DIR}" NO_DEFAULT_PATH REQUIRED)
+find_program(CMAKE_AR           NAMES arm-none-eabi-ar       PATHS "${GCC_BIN_DIR}" NO_DEFAULT_PATH REQUIRED)
+find_program(CMAKE_RANLIB       NAMES arm-none-eabi-ranlib   PATHS "${GCC_BIN_DIR}" NO_DEFAULT_PATH REQUIRED)
+
+# Search strategy
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+
+# Compile flags
+string(JOIN " " CMAKE_C_FLAGS_INIT
+    -mcpu=${CORE}
+    -march=${ARCH}
+    -mthumb
+    -mfloat-abi=${FLOAT_ABI}
+    -std=c17
+    -ffunction-sections
+    -fdata-sections
+    -g
+    -gstrict-dwarf
+    -Wall
+)
+string(JOIN " " CMAKE_CXX_FLAGS_INIT
+    -mcpu=${CORE}
+    -march=${ARCH}
+    -mthumb
+    -mfloat-abi=${FLOAT_ABI}
+    -std=c++17
+    -ffunction-sections
+    -fdata-sections
+    -g
+    -gstrict-dwarf
+    -Wall
+)
+string(JOIN " " CMAKE_ASM_FLAGS_INIT
+    -mcpu=${CORE}
+    -march=${ARCH}
+    -mthumb
+    -mfloat-abi=${FLOAT_ABI}
+    -x assembler-with-cpp
+)
+
+set(CMAKE_C_FLAGS_DEBUG_INIT   "-O3")
+set(CMAKE_C_FLAGS_RELEASE_INIT "-Os")
+set(CMAKE_CXX_FLAGS_DEBUG_INIT   "-O3")
+set(CMAKE_CXX_FLAGS_RELEASE_INIT "-Os")
+
+# Linker flags
+string(JOIN " " CMAKE_EXE_LINKER_FLAGS_INIT
+    -mcpu=${CORE}
+    -march=${ARCH}
+    -mthumb
+    -T${LINKER_SCRIPT}
+    -static
+    -specs=nano.specs
+    -specs=nosys.specs
+    -Wl,--gc-sections
+    -Wl,--no-warn-rwx-segments
+)
+
+set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+
+# Summary
+message(STATUS "========================================")
+message(STATUS "Toolchain: GCC ARM")
+message(STATUS "  Compiler Type:   ${COMPILER_TYPE}")
+message(STATUS "  Link Driver:     ${LINK_DRIVER}")
+message(STATUS "  Architecture:    ${ARCH}")
+message(STATUS "  Core:            ${CORE}")
+message(STATUS "  Float ABI:       ${FLOAT_ABI}")
+message(STATUS "  TI SDK Root:     ${TI_SDK_ROOT}")
+message(STATUS "  GCC Root:        ${GCC_ROOT}")
+message(STATUS "  Linker Script:   ${LINKER_SCRIPT}")
+message(STATUS "  C Compiler:      ${CMAKE_C_COMPILER}")
+message(STATUS "========================================")

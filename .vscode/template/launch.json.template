@@ -8,14 +8,14 @@
             "request": "launch",
             "type": "cortex-debug",
             "servertype": "openocd",
-            "serverpath": "@OPENOCD_ROOT@/bin/openocd.exe",
+            "serverpath": "@OPENOCD_ROOT@/bin/openocd",
             "configFiles": [
                 "${workspaceFolder}/.vscode/openocd_jlink.cfg"
             ],
             "searchDir": [
                 "@OPENOCD_ROOT@/openocd/scripts"
             ],
-            "gdbPath": "@GCC_ROOT@/bin/arm-none-eabi-gdb.exe",
+            "gdbPath": "@GDB_PATH@",
             "runToEntryPoint": "main",
             "showDevDebugOutput": "none"
         },
@@ -26,14 +26,14 @@
             "request": "launch",
             "type": "cortex-debug",
             "servertype": "openocd",
-            "serverpath": "@OPENOCD_ROOT@/bin/openocd.exe",
+            "serverpath": "@OPENOCD_ROOT@/bin/openocd",
             "configFiles": [
                 "${workspaceFolder}/.vscode/openocd_daplink.cfg"
             ],
             "searchDir": [
                 "@OPENOCD_ROOT@/openocd/scripts"
             ],
-            "gdbPath": "@GCC_ROOT@/bin/arm-none-eabi-gdb.exe",
+            "gdbPath": "@GDB_PATH@",
             "runToEntryPoint": "main",
             "showDevDebugOutput": "none"
         },
@@ -44,14 +44,14 @@
             "request": "launch",
             "type": "cortex-debug",
             "servertype": "openocd",
-            "serverpath": "@OPENOCD_ROOT@/bin/openocd.exe",
+            "serverpath": "@OPENOCD_ROOT@/bin/openocd",
             "configFiles": [
                 "${workspaceFolder}/.vscode/openocd_xds110.cfg"
             ],
             "searchDir": [
                 "@OPENOCD_ROOT@/openocd/scripts"
             ],
-            "gdbPath": "@GCC_ROOT@/bin/arm-none-eabi-gdb.exe",
+            "gdbPath": "@GDB_PATH@",
             "runToEntryPoint": "main",
             "showDevDebugOutput": "none"
         }

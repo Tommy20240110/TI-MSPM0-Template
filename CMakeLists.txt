@@ -2,9 +2,16 @@
 cmake_minimum_required(VERSION 3.28)
 
 # Propagate variables to try_compile subproject (CMake 3.24+)
-set(CMAKE_TRY_COMPILE_PLATFORM_VARIABLES TI_SDK_ROOT GCC_ROOT)
+set(CMAKE_TRY_COMPILE_PLATFORM_VARIABLES
+    TI_SDK_ROOT
+    GCC_ROOT
+    CLANG_ROOT
+    TI_CLANG_ROOT
+    COMPILER_TYPE
+    LINK_DRIVER
+)
 
-# Chip model (set by CMakePresets.json)
+# Chip model
 if(NOT DEFINED CHIP_MODEL)
     message(FATAL_ERROR "CHIP_MODEL not set. Run configure.bat first.")
 endif()
@@ -15,7 +22,6 @@ if(NOT EXISTS "${CMAKE_TOOLCHAIN_FILE}")
     message(FATAL_ERROR "Toolchain not found: ${CMAKE_TOOLCHAIN_FILE}\n"
                         "Run configure.bat to generate it.")
 endif()
-
 
 # Project definition
 project(${PROJECT_NAME} C CXX ASM)
@@ -53,21 +59,32 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 
 # Linker options
 # -T linker script / -specs etc. injected by toolchain
-target_link_options(${PROJECT_NAME} PRIVATE
-    -Wl,-Map=${MAP_FILE}
-)
+if(NOT COMPILER_TYPE STREQUAL "ticlang")
+    # Map file: CMake auto-generates --map_file= for TIClang, manual for GCC/Clang
+    target_link_options(${PROJECT_NAME} PRIVATE
+        -Wl,-Map=${MAP_FILE}
+    )
+endif()
 
-# Read and link libraries from SysConfig-generated device.lds.genlibs
-# Missing libs will error; disable genLib* features in .syscfg if needed
+# Read and link libraries from SysConfig-generated genlibs file
+# GCC/Clang: device.lds.genlibs (GNU LD INPUT format)
+# TIClang:   device.cmd.genlibs (TI linker -l format)
 include(${CMAKE_SOURCE_DIR}/.cmake/utils/link_syscfg_libs.cmake)
-link_syscfg_libs(${PROJECT_NAME} "${TI_SDK_ROOT}" "${CMAKE_SOURCE_DIR}/.ti/generate/device.lds.genlibs")
+if(COMPILER_TYPE STREQUAL "ticlang")
+    link_syscfg_libs(${PROJECT_NAME} "${TI_SDK_ROOT}" "${CMAKE_SOURCE_DIR}/.ti/generate/device.cmd.genlibs")
+else()
+    link_syscfg_libs(${PROJECT_NAME} "${TI_SDK_ROOT}" "${CMAKE_SOURCE_DIR}/.ti/generate/device.lds.genlibs")
+endif()
 
-# ARM GCC embedded runtime
-target_link_libraries(${PROJECT_NAME} PRIVATE
-    gcc
-    c
-    m
-)
+# ARM embedded runtime libraries
+if(LINK_DRIVER STREQUAL "gcc")
+    target_link_libraries(${PROJECT_NAME} PRIVATE gcc c m)
+elseif(LINK_DRIVER STREQUAL "ticlang")
+    # TIClang link driver: TI libc + compiler-rt linked automatically
+else()
+    # LLVM link driver: compiler-rt linked automatically by clang
+    target_link_libraries(${PROJECT_NAME} PRIVATE c m)
+endif()
 
 # Post-build: generate .hex file
 add_custom_command(
@@ -80,6 +97,8 @@ add_custom_command(
 message(STATUS "========================================")
 message(STATUS "Project:        ${PROJECT_NAME}")
 message(STATUS "Build Type:     ${CMAKE_BUILD_TYPE}")
+message(STATUS "Compiler Type:  ${COMPILER_TYPE}")
+message(STATUS "Link Driver:    ${LINK_DRIVER}")
 message(STATUS "Chip Model:     ${CHIP_MODEL}")
 message(STATUS "Chip Family:    ${CHIP_FAMILY}")
 message(STATUS "Core:           ${CORE}")

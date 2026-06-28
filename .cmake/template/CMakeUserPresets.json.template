@@ -5,15 +5,31 @@
             "name": "user-debug",
             "inherits": "debug",
             "displayName": "User Debug",
-            "description": "Debug configuration with user's SDK and GCC path",
+            "description": "Debug configuration with user's SDK, compiler and tool paths",
             "cacheVariables": {
                 "TI_SDK_ROOT": {
                     "type": "PATH",
                     "value": "@TI_SDK_ROOT@"
                 },
+                "COMPILER_TYPE": {
+                    "type": "STRING",
+                    "value": "@COMPILER_TYPE@"
+                },
+                "LINK_DRIVER": {
+                    "type": "STRING",
+                    "value": "@LINK_DRIVER@"
+                },
                 "GCC_ROOT": {
                     "type": "PATH",
                     "value": "@GCC_ROOT@"
+                },
+                "CLANG_ROOT": {
+                    "type": "PATH",
+                    "value": "@CLANG_ROOT@"
+                },
+                "TI_CLANG_ROOT": {
+                    "type": "PATH",
+                    "value": "@TI_CLANG_ROOT@"
                 }
             }
         },
@@ -21,15 +37,31 @@
             "name": "user-release",
             "inherits": "release",
             "displayName": "User Release",
-            "description": "Release configuration with user's SDK and GCC path",
+            "description": "Release configuration with user's SDK, compiler and tool paths",
             "cacheVariables": {
                 "TI_SDK_ROOT": {
                     "type": "PATH",
                     "value": "@TI_SDK_ROOT@"
                 },
+                "COMPILER_TYPE": {
+                    "type": "STRING",
+                    "value": "@COMPILER_TYPE@"
+                },
+                "LINK_DRIVER": {
+                    "type": "STRING",
+                    "value": "@LINK_DRIVER@"
+                },
                 "GCC_ROOT": {
                     "type": "PATH",
                     "value": "@GCC_ROOT@"
+                },
+                "CLANG_ROOT": {
+                    "type": "PATH",
+                    "value": "@CLANG_ROOT@"
+                },
+                "TI_CLANG_ROOT": {
+                    "type": "PATH",
+                    "value": "@TI_CLANG_ROOT@"
                 }
             }
         }

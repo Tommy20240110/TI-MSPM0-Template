@@ -21,7 +21,25 @@ if not exist "%INI_FILE%" (
 
 for /f "usebackq tokens=2 delims== " %%a in (`findstr /c:"SYSCFG_ROOT" "%INI_FILE%"`) do set "SYSCFG_ROOT=%%a"
 for /f "usebackq tokens=2 delims== " %%a in (`findstr /c:"TI_SDK_ROOT" "%INI_FILE%"`) do set "SDK_ROOT=%%a"
+for /f "usebackq tokens=2 delims== " %%a in (`findstr /c:"COMPILER_TYPE" "%INI_FILE%"`) do set "COMPILER_TYPE=%%a"
 for /f "usebackq tokens=2 delims== " %%a in (`findstr /c:"PROJECT_NAME" "%INI_FILE%"`) do set "PROJECT_NAME=%%a"
+
+:: Determine SysConfig --compiler flag
+::   gcc/clang: use --compiler gcc (generates .lds, compatible with GNU ld)
+::   ticlang:   use --compiler ticlang (generates .cmd, TI EABI format)
+if "!COMPILER_TYPE!"=="" (
+    echo ERROR: COMPILER_TYPE not set in config.ini. Run configure.bat first.
+    pause
+    exit /b 1
+)
+if /i "!COMPILER_TYPE!"=="gcc"      set "SYSCOMPILER=gcc"
+if /i "!COMPILER_TYPE!"=="clang"    set "SYSCOMPILER=gcc"
+if /i "!COMPILER_TYPE!"=="ticlang"  set "SYSCOMPILER=ticlang"
+if "!SYSCOMPILER!"=="" (
+    echo ERROR: Unknown COMPILER_TYPE '!COMPILER_TYPE!'
+    pause
+    exit /b 1
+)
 
 :: Validate
 if "%SYSCFG_ROOT%"=="" (
@@ -43,6 +61,7 @@ if "%PROJECT_NAME%"=="" (
 echo   Project:       %PROJECT_NAME%
 echo   SysConfig:     %SYSCFG_ROOT%
 echo   SDK:           %SDK_ROOT%
+echo   Compiler:      %COMPILER_TYPE% ^(SysConfig: %SYSCOMPILER%^)
 echo.
 
 :: Find the .syscfg file
@@ -88,7 +107,7 @@ echo Running SysConfig...
 call "%SYSCFG_ROOT%\sysconfig_cli.bat" ^
     -o "%PROJ_ROOT%\.ti\generate" ^
     -s "%SDK_ROOT%\.metadata\product.json" ^
-    --compiler gcc ^
+    --compiler !SYSCOMPILER! ^
     "%SYSCFG_FILE%"
 
 if not exist "%PROJ_ROOT%\.ti\generate" (

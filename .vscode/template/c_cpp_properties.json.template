@@ -12,8 +12,8 @@
     },
     "configurations": [
         {
-            "name": "Win32",
-            "compilerPath": "arm-none-eabi-gcc",
+            "name": "Win32-GCC",
+            "compilerPath": "@GCC_ROOT@/bin/arm-none-eabi-gcc",
             "intelliSenseMode": "windows-gcc-arm",
             "includePath": [
                 "${myIncludePath}",
@@ -32,8 +32,8 @@
             }
         },
         {
-            "name": "Mac",
-            "compilerPath": "arm-none-eabi-gcc",
+            "name": "Mac-GCC",
+            "compilerPath": "@GCC_ROOT@/bin/arm-none-eabi-gcc",
             "intelliSenseMode": "macos-gcc-arm",
             "includePath": [
                 "${myIncludePath}",
@@ -53,8 +53,128 @@
         },
         {
             "name": "Linux-GCC",
-            "compilerPath": "arm-none-eabi-gcc",
+            "compilerPath": "@GCC_ROOT@/bin/arm-none-eabi-gcc",
             "intelliSenseMode": "linux-gcc-arm",
+            "includePath": [
+                "${myIncludePath}",
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+                "${myDeviceDefines}"
+            ],
+            "cStandard": "c17",
+            "cppStandard": "c++20",
+            "browse": {
+                "path": [
+                    "${myIncludePath}",
+                    "${workspaceFolder}"
+                ]
+            }
+        },
+        {
+            "name": "Win32-Clang",
+            "compilerPath": "@CLANG_ROOT@/bin/clang",
+            "intelliSenseMode": "windows-clang-arm",
+            "includePath": [
+                "${myIncludePath}",
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+                "${myDeviceDefines}"
+            ],
+            "cStandard": "c17",
+            "cppStandard": "c++20",
+            "browse": {
+                "path": [
+                    "${myIncludePath}",
+                    "${workspaceFolder}"
+                ]
+            }
+        },
+        {
+            "name": "Mac-Clang",
+            "compilerPath": "@CLANG_ROOT@/bin/clang",
+            "intelliSenseMode": "macos-clang-arm",
+            "includePath": [
+                "${myIncludePath}",
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+                "${myDeviceDefines}"
+            ],
+            "cStandard": "c17",
+            "cppStandard": "c++20",
+            "browse": {
+                "path": [
+                    "${myIncludePath}",
+                    "${workspaceFolder}"
+                ]
+            }
+        },
+        {
+            "name": "Linux-Clang",
+            "compilerPath": "@CLANG_ROOT@/bin/clang",
+            "intelliSenseMode": "linux-clang-arm",
+            "includePath": [
+                "${myIncludePath}",
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+                "${myDeviceDefines}"
+            ],
+            "cStandard": "c17",
+            "cppStandard": "c++20",
+            "browse": {
+                "path": [
+                    "${myIncludePath}",
+                    "${workspaceFolder}"
+                ]
+            }
+        },
+        {
+            "name": "Win32-TIClang",
+            "compilerPath": "@TI_CLANG_ROOT@/bin/tiarmclang",
+            "intelliSenseMode": "windows-clang-arm",
+            "includePath": [
+                "${myIncludePath}",
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+                "${myDeviceDefines}"
+            ],
+            "cStandard": "c17",
+            "cppStandard": "c++20",
+            "browse": {
+                "path": [
+                    "${myIncludePath}",
+                    "${workspaceFolder}"
+                ]
+            }
+        },
+        {
+            "name": "Mac-TIClang",
+            "compilerPath": "@TI_CLANG_ROOT@/bin/tiarmclang",
+            "intelliSenseMode": "macos-clang-arm",
+            "includePath": [
+                "${myIncludePath}",
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+                "${myDeviceDefines}"
+            ],
+            "cStandard": "c17",
+            "cppStandard": "c++20",
+            "browse": {
+                "path": [
+                    "${myIncludePath}",
+                    "${workspaceFolder}"
+                ]
+            }
+        },
+        {
+            "name": "Linux-TIClang",
+            "compilerPath": "@TI_CLANG_ROOT@/bin/tiarmclang",
+            "intelliSenseMode": "linux-clang-arm",
             "includePath": [
                 "${myIncludePath}",
                 "${workspaceFolder}/**"

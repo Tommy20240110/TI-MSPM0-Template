@@ -5,13 +5,17 @@
             "label": "Project Configure",
             "type": "shell",
             "command": "${workspaceFolder}/scripts/configure.bat",
-            "problemMatcher": []
+            "problemMatcher": [],
+            "linux": { "command": "bash", "args": ["${workspaceFolder}/scripts/configure.sh"] },
+            "osx":   { "command": "bash", "args": ["${workspaceFolder}/scripts/configure.sh"] }
         },
         {
             "label": "TI Sysconfig Prebuild",
             "type": "shell",
             "command": "${workspaceFolder}/.ti/syscfg.bat",
-            "problemMatcher": []
+            "problemMatcher": [],
+            "linux": { "command": "bash", "args": ["${workspaceFolder}/.ti/syscfg.sh"] },
+            "osx":   { "command": "bash", "args": ["${workspaceFolder}/.ti/syscfg.sh"] }
         },
         {
             "label": "CMake configure",
@@ -54,10 +58,20 @@
             "problemMatcher": []
         },
         {
+            "label": "CMake reconfigure",
+            "detail": "Remove build/ entirely then re-run CMake configure",
+            "type": "shell",
+            "command": "cmake -E remove_directory build ; cmake --preset user-debug",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "CMake clean rebuild",
             "type": "shell",
             "dependsOn": [
-                "CMake clean",
+                "CMake reconfigure",
                 "CMake build"
             ],
             "dependsOrder": "sequence",
@@ -66,7 +80,7 @@
         {
             "label": "Flash (J-Link)",
             "type": "shell",
-            "command": "@OPENOCD_ROOT@/bin/openocd.exe",
+            "command": "@OPENOCD_ROOT@/bin/openocd",
             "args": [
                 "-s", "@OPENOCD_ROOT@/openocd/scripts",
                 "-f", "${workspaceFolder}/.vscode/openocd_jlink.cfg",
@@ -81,7 +95,7 @@
         {
             "label": "Flash (DAPLink)",
             "type": "shell",
-            "command": "@OPENOCD_ROOT@/bin/openocd.exe",
+            "command": "@OPENOCD_ROOT@/bin/openocd",
             "args": [
                 "-s", "@OPENOCD_ROOT@/openocd/scripts",
                 "-f", "${workspaceFolder}/.vscode/openocd_daplink.cfg",
@@ -96,7 +110,7 @@
         {
             "label": "Flash (XDS110)",
             "type": "shell",
-            "command": "@OPENOCD_ROOT@/bin/openocd.exe",
+            "command": "@OPENOCD_ROOT@/bin/openocd",
             "args": [
                 "-s", "@OPENOCD_ROOT@/openocd/scripts",
                 "-f", "${workspaceFolder}/.vscode/openocd_xds110.cfg",
